@@ -1,16 +1,41 @@
+# Match Me App
 
-## Getting Started
+> A full-stack dating application built with Next.js 14, Prisma, NextAuth, Pusher, and Cloudinary.
 
-First, run the development server:
+## URL
+
+[YouTube App Demo](https://youtu.be/HqlJjX9uIuk)
+
+## Tools
+
+- Next.js 14
+- Prisma
+- NextAuth (Auth.js)
+- Pusher
+- Cloudinary
+- Vercel
+- PostgreSQL
+- React Hook Form
+- Zod Validation
+- Zustand
+- TypeScript
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- PostgreSQL database
+
+## Installation
+
+1. Clone the repo
+2. Install packages `npm install`
+3. Set up environment variables in .env file
+4. Set up Prisma database
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx prisma generate
+npx prisma migrate dev
+npx prisma db seed
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Run the development server `npm run dev`
