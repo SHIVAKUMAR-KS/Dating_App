@@ -218,22 +218,58 @@ export async function completeSocialLoginProfile(data: ProfileSchema):
     if (!session?.user) return { status: 'error', error: 'User not found' };
 
     try {
-        const user = await prisma.user.update({
-            where: { id: session.user.id },
-            data: {
-                profileComplete: true,
-                member: {
-                    create: {
-                        name: session.user.name as string,
-                        image: session.user.image,
-                        gender: data.gender,
-                        dateOfBirth: new Date(data.dateOfBirth),
-                        description: data.description,
-                        city: data.city,
-                        country: data.country
+        // First check if user exists
+        const existingUser = await prisma.user.findUnique({
+            where: { id: session.user.id }
+        });
+
+        if (!existingUser) {
+            // Create the user if they don't exist
+            await prisma.user.create({
+                data: {
+                    id: session.user.id,
+                    name: session.user.name,
+                    email: session.user.email,
+                    image: session.user.image,
+                    emailVerified: new Date(),
+                    profileComplete: true,
+                    member: {
+                        create: {
+                            name: session.user.name as string,
+                            image: session.user.image,
+                            gender: data.gender,
+                            dateOfBirth: new Date(data.dateOfBirth),
+                            description: data.description,
+                            city: data.city,
+                            country: data.country
+                        }
                     }
                 }
-            },
+            });
+        } else {
+            // Update existing user
+            await prisma.user.update({
+                where: { id: session.user.id },
+                data: {
+                    profileComplete: true,
+                    member: {
+                        create: {
+                            name: session.user.name as string,
+                            image: session.user.image,
+                            gender: data.gender,
+                            dateOfBirth: new Date(data.dateOfBirth),
+                            description: data.description,
+                            city: data.city,
+                            country: data.country
+                        }
+                    }
+                }
+            });
+        }
+
+        // Get the provider information
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
             select: {
                 accounts: {
                     select: {
@@ -241,7 +277,9 @@ export async function completeSocialLoginProfile(data: ProfileSchema):
                     }
                 }
             }
-        })
+        });
+
+        if (!user) throw new Error('User not found after creation/update');
 
         return { status: 'success', data: user.accounts[0].provider }
     } catch (error) {
